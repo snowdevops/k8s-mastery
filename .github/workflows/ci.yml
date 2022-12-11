@@ -20,5 +20,7 @@ jobs:
       with:
           java-version: '11'
           distribution: 'adopt'
-    - name: Build with Maven
-      run: mvn --batch-mode --update-snapshots package
+    - name: Build web with Maven
+      run: |
+      cd sa-webapp
+      mvn --batch-mode --update-snapshots clean package

@@ -9,11 +9,6 @@
 
 name: ci_with_maven
 
-#on:
-  #push:
-    #branches: [ "master" ]
-  #pull_request:
-    #branches: [ "master" ]
     
 on: workflow_dispatch
 
@@ -35,22 +30,31 @@ jobs:
 
 
   publish:
+    name: publish
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: ServiceNow DevOps Unit Test Results
-        uses: ServiceNow/servicenow-devops-test-report@v3.1.0
+      - name: ServiceNow DevOps Register Artifact
+        uses: ServiceNow/servicenow-devops-register-artifact@v5.1.0
         with:
-        devops-integration-token:  ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
-        instance-url: ${{ secrets.SN_INSTANCE_URL }}
-        tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
-        job-name: build
-        context-github: ${{ toJSON(github) }}
-        xml-report-filename: target/surefire-reports/TEST-com.sa.web.SentimentControllerTest.xml
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          # ServiceNow Instance URL
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          # Orchestration Tool Id
+          tool-id:  ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          # Display Name of the Job
+          job-name: publish
+          # Github Context
+          context-github:  ${{ toJSON(github) }}
+          # List of Artifacts to be registered
+          artifacts: '[{"name": "com:customactiondemo","version": "1.${{ github.run_number }}","semanticVersion": "1.${{ github.run_number }}.0","repositoryName": "${{ github.repository }}"}]'
+
+
     
 
   deploy:
     name: Deploy
-    needs: build
+    needs: publish
     runs-on: ubuntu-latest
     steps:     
       - name: ServiceNow Change

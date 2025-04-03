@@ -27,8 +27,6 @@ jobs:
       run: |
         cd sa-webapp
         mvn -B package --file pom.xml
-    - name: list test files
-      run: ls -lrta target/surefire-reports/
 
 
   publish:
